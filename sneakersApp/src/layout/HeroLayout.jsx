@@ -1,6 +1,6 @@
 const HeroLayout = ({ children }) => {
   return (
-    <header className="lg:max-w-[70%]  lg:mt-2 lg:border-t border-t-gray-300 mx-auto ">
+    <header className="md:max-w-[70%] lg:min-w-3/4 flex items-center mx-auto flex-col lg:flex-row lg:mt-6  justify-between">
       {children}
     </header>
   );
