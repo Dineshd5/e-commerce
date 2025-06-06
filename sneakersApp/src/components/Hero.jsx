@@ -1,87 +1,153 @@
-import { useState } from "react";
-import product1 from "../assets/image-product-1.jpg";
+import { useReducer, useState } from "react";
 import { FaPlus } from "react-icons/fa";
 import { FaMinus } from "react-icons/fa";
-import thumbnailImg from "../data";
+import ProductData from "../data";
 import HeroLayout from "../layout/HeroLayout";
 import Button from "./Button";
+import { IoCloseOutline } from "react-icons/io5";
+function reducer(state, action) {
+  if (action.type === "increase") {
+    return state + 1;
+  } else if (action.type === "decrease") {
+    if (state === 0) return 0;
+    return state - 1;
+  }
+  return state;
+}
 
 const Hero = () => {
+  const [index, setIndex] = useState(0);
+  const [previewProduct, setPreviewProduct] = useState(false);
+  const data = [...ProductData];
+  // console.log("data", data);
+
+  // console.log(cartData);
+
+  const [state, dispatch] = useReducer(reducer, 0);
+
+  const handleChange = (i) => {
+    setIndex(i);
+    setPreviewProduct(true);
+  };
+
+  const handleAdd = () => {
+    setCartData((prev) => prev + 1);
+  };
 
   return (
     <HeroLayout>
-      {/*left side bar */}
-      <div className="flex xl:ml-15 m-0 flex-auto flex-col gap-y-6 ">
+      {/*left side */}
+      <div className="flex flex-auto flex-col m-0 gap-y-6 xl:ml-15">
         <img
-          src={product1}
+          src={data[1].MainImg}
           alt="product"
-          className="lg:w-96 lg:rounded-xl lg:mt-10 "
+          className="lg:w-96 lg:mt-10 lg:rounded-xl"
         />
-        <ul className="lg:flex gap-x-6 hidden">
-          {thumbnailImg.map((item, _) => (
+        <ul className="hidden gap-x-6 lg:flex">
+          {data.map((item, i) => (
             <li
+              onClick={() => handleChange(i)}
               key={item.id}
-              className="hover:border-orange-600 hover:border-2 
-                rounded-sm w-20 cursor-pointer  "
+              className="w-20 rounded-sm cursor-pointer hover:border-orange-600 hover:border-2"
             >
               <img
-                src={item.img}
+                src={item.ThumbImg}
                 alt="image"
-                className="rounded-sm hover:opacity-30 cursor-pointer"
+                className="rounded-sm cursor-pointer hover:opacity-30"
               />
             </li>
           ))}
         </ul>
       </div>
-      {/*right side bar */}
-      <div className=" p-5 flex-auto lg:min-w-[300px] space-y-10  lg:mt-5 ">
+      {previewProduct ? (
+        <>
+          <div className=" fixed top-0 left-0 w-screen bg-black opacity-45 z-40 h-screen "></div>
+          <div className=" fixed z-50 right-150">
+            <div className=" flex flex-auto flex-col m-0 gap-y-6 xl:ml-15">
+              <img
+                src={data[index].MainImg}
+                alt="product"
+                className="lg:w-96 lg:mt-10 lg:rounded-xl"
+              />
+              <IoCloseOutline
+                onClick={() => {
+                  setPreviewProduct(!previewProduct);
+                }}
+                className="fixed z-60 size-[30px] text-white top-25 right-150 cursor-pointer"
+              />
+              <ul className="hidden gap-x-6 lg:flex">
+                {data.map((item, i) => (
+                  <li
+                    onClick={() => handleChange(i)}
+                    key={item.id}
+                    className="w-20 rounded-sm cursor-pointer hover:border-orange-600 hover:border-2"
+                  >
+                    <img
+                      src={item.ThumbImg}
+                      alt="image"
+                      className="rounded-sm cursor-pointer hover:opacity-30"
+                    />
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </>
+      ) : null}
+      {/*right side  */}
+      <div className=" flex-auto p-5 space-y-10 lg:min-w-[300px] lg:mt-5">
         {/*Content */}
         <div>
-          <h5 className="uppercase text-sm font-bold text-gray-600">
-            Sneaker company
+          <h5 className="text-sm font-bold text-gray-600 uppercase">
+            Sneaker Company
           </h5>
-          <h1 className="text-4xl mt-5 max-w-md font-bold text-gray-600">
-            Fall Limited Edition Sneakers
+          <h1 className="max-w-md mt-5 text-4xl font-bold text-gray-600">
+            {data[index].title}
           </h1>
         </div>
         {/*Heading */}
         <div className="max-w-md">
-          <p className="text-md text-gray-600">
-            The low-profile sneakers are perfect casual wear companion.featuring
-            a durable rubber outer sole. they'll withstand everything the
-            weather can offer.
-          </p>
+          <p className="text-md text-gray-600 ">{data[index].description}</p>
           {/*Price */}
-          <div className="mt-4 flex flex-row justify-between items-center space-y-2 ">
+          <div className="flex flex-row mt-4 space-y-2 justify-between items-center">
             <div className="flex items-center">
-              <h1 className="font-bold text-2xl inline-block">&#36; 125.00</h1>
-              <span className="px-2 py-1 ml-4 inline-block bg-gray-800 text-white rounded-sm ">
-                50%
+              <h1 className="inline-block font-bold text-2xl">
+                &#36;
+                {data[index].price * (1 - data[index].percent / 100).toFixed(2)}
+              </h1>
+              <span className=" inline-block  px-2 py-1 ml-4  text-white  bg-gray-800 rounded-sm">
+                {data[index].percent}%
               </span>
             </div>
             <div>
-              <del className="font-bold text-gray-600">&#36; 125.00</del>
+              <del className="font-bold text-gray-600">
+                &#36; {data[index].price}
+              </del>
             </div>
           </div>
         </div>
         {/*Buttons  */}
 
-        <div className="flex md:gap-2 sm:flex-row flex-col items-center mb-4">
-          {/*increase and decrease button */}
-          <div className=" gap-4 space-x-4 lg:gap-4 px-10 py-2 bg-slate-100 rounded-md cursor-pointer ">
-            {/*correct here */}
-
-            <button className="text-orange-500 cursor-pointer ">
-              <FaPlus className="inline-block" />
-            </button>
-
-            <p className="font-medium inline-block ">{0}</p>
-
-            <button className="text-orange-500 cursor-pointer">
+        {/*increase and decrease button */}
+        <div className="flex flex-col justify-center md:justify-start mb-4 items-center sm:flex-row md:gap-2">
+          <div className="space-x-4 px-10 py-2 bg-slate-100 rounded-md cursor-pointer gap-4 lg:gap-4">
+            <button
+              className="text-orange-500 cursor-pointer"
+              onClick={() => dispatch({ type: "decrease" })}
+            >
               <FaMinus className="inline-block" />
             </button>
+            <p className=" inline-block font-medium ">{state}</p>
+
+            <button
+              className=" text-orange-500 cursor-pointer  "
+              onClick={() => dispatch({ type: "increase" })}
+            >
+              <FaPlus className="inline-block " />
+            </button>
           </div>
-          <Button />
+          <Button handleAdd={handleAdd} />
+
           {/*Add to Cart button */}
         </div>
       </div>
